@@ -1,79 +1,159 @@
-
 package chat;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Random;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+public class LoginTest {
 
-class Message {
+    // ================= USERNAME SUCCESS =================
+    @Test
+    public void testCheckUserNameSuccess() {
 
-    Message(int par, String string, String hi_Mike_can_you_join_us_for_dinner_tonigh) {
-    }
-   
+        Login login = new Login();
 
-    public String generateMessageID() {
+        boolean result = login.checkUserName("kyl_1");
 
-        Random random = new Random();
-
-        long number = 1000000000L
-                + (long) (random.nextDouble() * 9000000000L);
-
-        return String.valueOf(number);
+        assertTrue(result);
     }
 
-    public String checkRecipientCell(String cell) {
+    // ================= USERNAME FAILURE =================
+    @Test
+    public void testCheckUserNameFailure() {
 
-        if (cell.matches("\\+27\\d{9}")) {
+        Login login = new Login();
 
-            return "Cell phone number successfully captured.";
-        }
+        boolean result = login.checkUserName("kyle!!!!!!");
 
-        return "Cell phone number is incorrectly formatted or does not contain an international code.";
+        assertFalse(result);
     }
 
-    public String createMessageHash(String id, int count, String message) {
+    // ================= PASSWORD SUCCESS =================
+    @Test
+    public void testCheckPasswordComplexitySuccess() {
 
-        if (message.trim().isEmpty()) {
+        Login login = new Login();
 
-            return "INVALID MESSAGE";
-        }
+        boolean result = login.checkPasswordComplexity("Ch&&sec@ke99!");
 
-        String[] words = message.trim().split("\\s+");
-
-        String firstWord = words[0];
-        String lastWord = words[words.length - 1];
-
-        String hash = id.substring(0, 2)
-                + ":" + count
-                + ":" + firstWord + lastWord;
-
-        return hash.toUpperCase();
+        assertTrue(result);
     }
 
-    public void saveMessageToJSON(String id, String hash,
-                                  String recipient, String message) {
+    // ================= PASSWORD FAILURE =================
+    @Test
+    public void testCheckPasswordComplexityFailure() {
 
-        try {
+        Login login = new Login();
 
-            FileWriter writer = new FileWriter("messages.json", true);
+        boolean result = login.checkPasswordComplexity("password");
 
-            writer.write("{\n");
-            writer.write("  \"MessageID\": \"" + id + "\",\n");
-            writer.write("  \"MessageHash\": \"" + hash + "\",\n");
-            writer.write("  \"Recipient\": \"" + recipient + "\",\n");
-            writer.write("  \"Message\": \"" + message + "\"\n");
-            writer.write("}\n\n");
-
-            writer.close();
-
-        } catch (IOException e) {
-
-            System.out.println("Error writing to JSON file.");
-        }
+        assertFalse(result);
     }
 
-    
+    // ================= CELL NUMBER SUCCESS =================
+    @Test
+    public void testCheckCellPhoneNumberSuccess() {
 
-    
+        Login login = new Login();
+
+        boolean result = login.equals("+27838968976");
+
+        assertTrue(result);
+    }
+
+    // ================= CELL NUMBER FAILURE =================
+    @Test
+    public void testCheckCellPhoneNumberFailure() {
+
+        Login login = new Login();
+
+        boolean result = login.equals("08966553");
+
+        assertFalse(result);
+    }
+
+    // ================= REGISTER USER SUCCESS =================
+    @Test
+    public void testRegisterUserSuccess() {
+
+        Login login = new Login();
+
+        String expected =
+        "Username and Password successfully captured.";
+
+        String actual = login.registerUser(
+                "kyl_1",
+                "Ch&&sec@ke99!",
+                "+27838968976",
+                "Kyle",
+                "Smith"
+        );
+
+        assertEquals(expected, actual);
+    }
+
+    // ================= LOGIN SUCCESS =================
+    @Test
+    public void testLoginUserSuccess() {
+
+        Login login = new Login();
+
+        login.registerUser(
+                "kyl_1",
+                "Ch&&sec@ke99!",
+                "+27838968976",
+                "Kyle",
+                "Smith"
+        );
+
+        boolean result = login.loginUser(
+                "kyl_1",
+                "Ch&&sec@ke99!"
+        );
+
+        assertTrue(result);
+    }
+
+    // ================= LOGIN FAILURE =================
+    @Test
+    public void testLoginUserFailure() {
+
+        Login login = new Login();
+
+        login.registerUser(
+                "kyl_1",
+                "Ch&&sec@ke99!",
+                "+27838968976",
+                "Kyle",
+                "Smith"
+        );
+
+        boolean result = login.loginUser(
+                "wrong",
+                "wrong"
+        );
+
+        assertFalse(result);
+    }
+
+    // ================= LOGIN STATUS =================
+    @Test
+    public void testReturnLoginStatus() {
+
+        Login login = new Login();
+
+        login.registerUser(
+                "kyl_1",
+                "Ch&&sec@ke99!",
+                "+27838968976",
+                "Kyle",
+                "Smith"
+        );
+
+        String expected =
+        "Welcome Kyle Smith, it is great to see you again.";
+
+        String actual = login.returnLoginStatus(true);
+
+        assertEquals(expected, actual);
+    }
 }
